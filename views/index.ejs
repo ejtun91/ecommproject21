@@ -1,0 +1,802 @@
+
+<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+<link rel="stylesheet" href="stylesheets/style.css">
+<script>
+  var username = $('#username').val();
+</script>
+
+
+
+<head>
+ 
+</head>
+<body>
+  
+
+
+<div data-role="page" id="homepage">
+
+	<div data-role="header">
+		<h1>Page Title</h1>
+	</div><!-- /header -->
+
+	<div role="main" class="ui-content">
+        
+        
+        <a href="#register" class="ui-btn">Register</a>
+        <a href="#login" class="ui-btn">Login</a>
+        
+        
+        
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		<h4>Page Footer</h4>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+
+
+<div data-role="page" id="register">
+
+	<div data-role="header">
+		<h1>Register</h1>
+	</div><!-- /header -->
+
+	<div role="main" class="ui-content">
+	
+    
+    Username <input type="text" id="username"/> <br>
+
+    E-mail <input type="text" id="email"/> <br>
+    
+    Password <input type="text" id="password"/> <br>
+
+    Account type <input type="text" id="acctype"/> <br>
+
+
+    <button id="submitbutton" style="padding-bottom: 30px;"> Submit Button </button>
+    
+    
+    
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		<h4>Page Footer</h4>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+
+
+<script>
+
+// when the submitbutton is clicked
+$( "#submitbutton" ).click(function(event) {
+  // stop the default redirect of the browser
+  event.preventDefault();
+  
+  // grab the values
+  var username = $('#username').val();
+  var email = $('#email').val();
+  var password = $('#password').val();
+  var acctype = $('#acctype').val();
+  
+  
+  var isValid = true;
+  
+  if(username == ""){
+     alert("Please enter a username");
+     isValid = false;
+  }
+  if(!email.includes("@")){
+     alert("Please enter a valid email");
+     isValid = false;
+  }
+
+ // only send the data to the database, if the param is true.
+  if(isValid == true){
+      // send the data to the server-side
+      $.post( "/putInDatabase", { username: username, email: email, password:password, acctype:acctype })
+      .done(function( data ) {
+        alert( "Data Loaded: " + data );
+      });
+  }
+  
+  
+  
+});
+
+</script>
+
+
+
+
+
+
+
+
+<div data-role="page" id="login">
+
+
+
+	<div data-role="header">
+		<h1>Login</h1>
+	</div><!-- /header -->
+
+	<div role="main" class="ui-content">
+        
+        
+        Username <input type="text" id="loginUsername"/> <br>
+        Password <input type="text" id="loginPassword"/> <br>
+
+        
+         <a id="loginbutton" class="ui-btn"> Login Button </a>
+         
+         
+        
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		<h4>Page Footer</h4>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<script>
+   var name = '';
+// when the submitbutton is clicked
+$( "#loginbutton" ).click(function(event) {
+  // stop the default redirect of the browser
+  event.preventDefault();
+  
+  // grabbing the values
+  var un = $('#loginUsername').val();
+  var pw = $('#loginPassword').val();
+  
+  if(un == "")
+  {
+     alert("Please enter a username");
+  }
+  if(pw ==""){
+    alert("please enter a password");
+  }
+  
+
+  
+  $.post( "/checkTheLogin", { username: un, password: pw })
+      .done(function( data ) {
+        // say what the account type is
+        alert( "Data Loaded: " + data );
+
+         // put in the session
+    $.post( "/putInSession", { un: username} );
+
+        if(data.includes("customer")){
+
+          $('#recents').click(function(event){
+                event.preventDefault();
+
+                $.get( "/getRecents", {un: un}) 
+                .done(function( data ) {
+                  // throw the data onto the manager page
+                $( "#recentsOutput" ).html( data );
+               });
+          
+
+            
+                
+                 // move to the recent orders
+                window.location="/#recents";
+
+
+              });
+          
+
+        // move to the customer dashboard
+        window.location="/#customerdash";
+           
+        }
+        else if(data.includes("driver")){
+        
+           // move to the driver dashboard
+            // make a call to the severside to get the data!
+            // $.get( "/getDriverData", function( data ) {
+            // // throw the data onto the manager page
+            //     $( "#driverOutput" ).html( data );
+
+                
+
+          
+            // });
+
+
+           
+            
+                
+        
+           // move to the manager dashboard
+           window.location="/driver";
+        }
+        else if(data.includes("manager")){
+        
+        
+      //      // make a call to the severside to get the data!
+      //       $.get( "/getManagerData", function( data ) {
+      //       // throw the data onto the manager page
+      //           $( "#managerOutput" ).html( data );
+          
+      //       });
+
+      //       $.get('/getRevenueManager', function(data){
+      //    $("#revenue").html(data);
+      //  })
+                
+        
+           // move to the manager dashboard
+           window.location="/manager";
+        }
+        
+        
+      });
+  
+  
+ }); 
+
+
+  
+</script>
+
+<style>
+  table, td, th {
+  border: 1px solid black;
+  background-color: white;
+  padding: 10px;
+  
+}
+
+.ui-content{
+  min-height: 100vh;
+  background-color: rgb(229, 246, 252);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.ui-btn {
+    height: 20px !important;
+    width: 300px !important;
+    margin: 30px auto;
+    border-radius: 10px;
+    border: 1px solid black !important;
+}
+.ui-btn:hover{
+  box-shadow: 3px 3px 3px rgb(154, 155, 155);
+  
+  background: black !important;
+  color: white !important;
+}
+
+</style>
+
+<script>
+var myCart = [];
+
+var price = [5,3,2];
+
+</script>
+
+<div data-role="page" id="customerdash">
+
+	<div data-role="header">
+		<h1>Customer Dash</h1>
+	</div><!-- /header -->
+
+
+	<div role="main" class="ui-content">
+	
+
+    <div id="output">
+
+
+    </div>
+
+      <h1 style="text-align:center">MENU</h1>
+    <table style="width:50%;text-align: center;margin: auto;border-collapse: collapse;">
+      <tr>
+        <% outputMenu.forEach(function(item) { %>
+          <td><%= item.name %></td>
+          <% }); %>
+      </tr>
+      <tr>
+        <% outputMenu.forEach(function(item) { %>
+          <td><%= item.price %>€</td>
+          <% }); %>
+      </tr>
+      <tr>
+        <% outputMenu.forEach(function(item) { %>
+          <td><img src="<%= item.picturepath %>" style="height:100px;width:100px"></td>
+          <% }); %>
+      </tr>
+    </table>
+    <div style="width: 50%;margin: 50px auto;">
+      <a id="recents" class="ui-btn">My Recent Orders</a>
+  </div>
+        
+        <div class="ui-field-contain">
+            <label for="select-native-2">chocolate doughnut</label>
+           
+        <select id="chocolate_doughnut_qty" name="select-native-2" id="select-native-2" data-mini="true">
+                <option value=""></option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+            </select>
+        <button id="addtocart" style="padding-bottom: 30px;margin: 15px 10px;" onclick="addToCart('chocolate_doughnut_qty')"> Add To Cart </button>
+
+        <p></p>
+        
+         <button id="deleteProduct" style="padding-bottom: 30px;margin: 15px 10px;" onclick="deleteProduct('chocolate doughnut')">Delete product </button> 
+
+        </div>    
+
+
+        <div class="ui-field-contain">
+            <label for="select-native-2">plain ring</label>
+           
+        <select id="ring_doughnut_qty" name="select-native-2" id="select-native-2" data-mini="true">
+                <option value=""></option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+            </select>
+        <button id="addtocart" style="padding-bottom: 30px;margin: 15px 10px;"  onclick="addToCart('ring_doughnut_qty')"> Add To Cart </button>
+
+        <p></p>
+        
+        <button id="deleteProduct" style="padding-bottom: 30px;margin: 15px 10px;" onclick="deleteProduct('plain ring')">Delete product </button> 
+
+        </div>    
+
+        <div class="ui-field-contain">
+          <label for="select-native-2">Lemon Doughnut</label>
+         
+      <select id="lemon_doughnut_qty" name="select-native-2" id="select-native-2" data-mini="true">
+              <option value=""></option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+          </select>
+      <button id="addtocart" style="padding-bottom: 30px;margin: 15px 10px;"  onclick="addToCart('lemon_doughnut_qty')"> Add To Cart </button>
+
+      <p></p>
+        
+      <button id="deleteProduct" style="padding-bottom: 30px;margin: 15px 10px;" onclick="deleteProduct('Lemon Doughnut')">Delete product </button> 
+
+      </div>    
+
+      <div class="ui-field-contain">
+        <label for="select-native-2">Sprinkle Doughnut</label>
+       
+    <select id="sprinkle_doughnut_qty" name="select-native-2" id="select-native-2" data-mini="true">
+            <option value=""></option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+        </select>
+    <button id="addtocart" style="padding-bottom: 30px;margin: 15px 10px;"  onclick="addToCart('sprinkle_doughnut_qty')"> Add To Cart </button>
+    
+    <p></p>
+        
+    <button id="deleteProduct" style="padding-bottom: 30px;margin: 15px 10px;" onclick="deleteProduct('Sprinkle Doughnut')">Delete product </button> 
+    </div>    
+
+    <div class="ui-field-contain">
+      <label for="select-native-2">Jam Doughnut</label>
+     
+  <select id="jam_doughnut_qty" name="select-native-2" id="select-native-2" data-mini="true">
+          <option value=""></option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+      </select>
+  <button id="addtocart" style="padding-bottom: 30px;margin: 15px 10px;"  onclick="addToCart('jam_doughnut_qty')"> Add To Cart </button>
+
+  <p></p>
+        
+  <button id="deleteProduct" style="padding-bottom: 30px;margin: 15px 10px;" onclick="deleteProduct('Jam Doughnut')">Delete product </button> 
+
+  </div>    
+
+  
+  <div class="ui-field-contain">
+    <label for="select-native-2">Iced Doughnut</label>
+   
+<select id="iced_doughnut_qty" name="select-native-2" id="select-native-2" data-mini="true">
+        <option value=""></option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+    </select>
+<button id="addtocart" style="padding-bottom: 30px;margin: 15px 10px;"  onclick="addToCart('iced_doughnut_qty')"> Add To Cart </button>
+
+<p></p>
+        
+<button id="deleteProduct" style="padding-bottom: 30px;margin: 15px 10px;" onclick="deleteProduct('Iced Doughnut')">Delete product </button> 
+
+</div>    
+
+<div class="ui-field-contain">
+  <label for="select-native-2">Sprite</label>
+ 
+<select id="sprite_qty" name="select-native-2" id="select-native-2" data-mini="true">
+      <option value=""></option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+  </select>
+<button id="addtocart" style="padding-bottom: 30px;margin: 15px 10px;"  onclick="addToCart('sprite_qty')"> Add To Cart </button>
+
+<p></p>
+        
+<button id="deleteProduct" style="padding-bottom: 30px;margin: 15px 10px;" onclick="deleteProduct('Sprite')">Delete product </button> 
+
+</div>    
+
+<div class="ui-field-contain">
+  <label for="select-native-2">Fanta</label>
+ 
+<select id="fanta_qty" name="select-native-2" id="select-native-2" data-mini="true">
+      <option value=""></option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+  </select>
+<button id="addtocart" style="padding-bottom: 30px;margin: 15px 10px;"  onclick="addToCart('fanta_qty')"> Add To Cart </button>
+
+<p></p>
+        
+<button id="deleteProduct" style="padding-bottom: 30px;margin: 15px 10px;" onclick="deleteProduct('Fanta')">Delete product </button> 
+
+</div>  
+
+
+        <h1 style="text-transform:uppercase; position: absolute; order: 2; margin-left: auto; top: 50vh; left: 10vh;" id="total">Total: 0</h1>
+        <h3 style="visibility: hidden;" id="product">Product: 0</h3>
+
+        <button id="goToCheckout" style="padding-bottom: 30px;margin: 15px 10px;" > Checkout </button>
+
+        
+         
+        
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		<h4>Page Footer</h4>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+
+
+<div data-role="page" id="checkoutreview">
+
+	<div data-role="header">
+		<h1>Review your order</h1>
+	</div><!-- /header -->
+
+	<div role="main" class="ui-content">
+		 
+            
+          <div id="products">
+          </div>
+
+          <h1 style="text-align:center">Review Order</h1>
+          <table id="order" style="width:50%;text-align: center;margin: auto;border-collapse: collapse;">
+            <tr>
+            
+            </tr>
+          </table>
+
+          <h2 id="totalCheck">Total: </h2>
+          <h3 id="ship"></h3>
+          <h3 id="orderid" style="visibility: hidden;"></h3>
+          <h1 id="finishedOrder"></h1>
+
+          <div style="text-align: center;">
+          <a href="#popupLogin" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-a" style="margin: 15px 10px;"  data-transition="pop">Enter your address</a>
+        </div>
+          <div data-role="popup" id="popupLogin" data-theme="a" class="ui-corner-all">
+                    <div style="padding:10px 20px;">
+                        <h3>Please enter your address</h3>
+                        <label for="un" class="ui-hidden-accessible">Address:</label>
+                        <input type="text" name="user" id="un" value="" placeholder="address" data-theme="a">
+                        <button id="submitaddress" type="submit"  style="padding-bottom: 30px;margin: 15px 10px;"  class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check">Submit</button>
+                    </div>
+            </div>
+
+            <script>
+
+        
+              $( "#submitaddress" ).click(function(event) {
+                // stop the default redirect of the browser
+                event.preventDefault();
+  
+                // grab the values
+                var address = $('#un').val();
+                var user = $('#loginUsername').val();
+
+                $.post( "/putInAddress", { address: address, user: user })
+                  .done(function( data ) {
+                  alert( "Data Loaded: " + data );
+                  $('#popupLogin').hide();
+                  $('#ship').html("Shipping Address is: " + address);
+                  $('#orderid').html(data);
+                  });
+
+                 
+              });
+            </script>
+        
+         <button id="insertintodb" style="padding-bottom: 30px;margin: 15px 10px;" >Complete Checkout</button>
+        
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		<h4>Page Footer</h4>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<script>
+$( "#insertintodb" ).click(function() {
+
+    // get the persons username
+     var orderby = $('#loginUsername').val();
+     var total = parseInt($('#total').text().replace(/[^0-9.]/g, ""));
+     var username = $('#username').val();
+     var orderId = parseInt($('#orderid').text());
+     
+     // get the list of products from the shopping cart
+     var items = myCart.toString();
+     if(!items == ""){
+     $.post( "/completeCheckout", { orderby:orderby, items:items, total:total, username:username, orderId:orderId })
+          .done(function( data ) {
+            alert( "Data Loaded: ");
+            $('#finishedOrder').html("You completed your order and paid " + total + "€");
+          });      
+        }else{
+          alert("You have to choose at least 1 product");
+        }
+});
+</script> 
+
+
+<script>
+
+  // this function triggers, every time a page is loaded
+$(document).on("pagecreate",function(event){
+  
+  
+  $.get( "/checkIfTimeLeft", function( data ) {
+ 
+          if(data.includes("ok")){
+          
+          } else {
+              
+               // session expired
+               window.location="/";
+          }
+    });
+  
+});
+
+$( "#goToCheckout" ).click(function() {
+
+        // update the div tag with the shopping cart
+        
+        var cartItems = myCart.toString().split(',');
+        // for each record, append them to the procuts div.
+
+        console.log(cartItems)
+        
+        // wipe the products div tag!
+        $('#order').html('');
+        
+        for(var i=0; i < cartItems.length; i++){
+            $('#order').append("<tr><th>Item - Quantity</th></tr><tr><td>" + cartItems[i] + "</td></tr>");
+        }
+        
+       
+
+        // move to to the checkout review
+        window.location="/#checkoutreview";
+});
+var sum = 0;
+var product = 1;
+
+function addToCart(itemName){
+    // finding out the name of the ITEM we are adding
+  var item = itemName;
+	//console.log(item);
+
+  
+
+    // dynamically find out the qty
+	var qty = $('#'+item).children("option:selected").val();
+	//console.log(qty);
+
+  var menu = '<%- JSON.stringify(outputMenu) %>';
+
+  var menuData = {menus: JSON.parse(menu)}
+
+  console.log($('#'+item).closest(".ui-field-contain").find('label').text());
+
+  for(var i = 0; i < menuData.menus.length; i++){
+    if($('#'+item).closest(".ui-field-contain").find('label').text() == menuData.menus[i].name){
+      product = qty * menuData.menus[i].price;
+      sum += product;
+      console.log(sum);
+    }
+  }
+
+ 
+
+
+  
+  $('#total').html("Total: " + sum + "€");
+  $('#product').html(product);
+  $('#totalCheck').html("Total: " + sum + "€");
+
+
+    //console.log(parseInt($('#total').text()));
+  
+    
+    // search the cart and see if we already added
+    // the item. If we did, remove the old qty.
+
+    myCart.forEach(function(itemCurrent, index, array) {
+           
+           console.log("in array" + itemCurrent);
+           
+           if(itemCurrent.includes(itemName)){
+              console.log("Removing previous reference to " + itemName);
+                var indexx = array.indexOf(itemCurrent);
+                if (indexx !== -1) {
+                  array.splice(indexx, 1);
+                }
+           }
+    });
+    
+    
+    // add the item to the cart
+    myCart.push($('#'+item).closest(".ui-field-contain").find('label').text() + '-' + qty);
+    
+    alert(myCart);
+
+    // put in the session
+    $.post( "/putInSession", { cart: myCart} );
+
+}
+
+
+function deleteProduct(item){
+  
+    var productNr = parseInt($('#product').text());
+    // loop over the cart
+    myCart.forEach(function(itemCurrent, index, array) {
+                
+               // look for the item we want to delete.
+               if(itemCurrent.includes(item)){
+                  console.log("Removing previous reference to " + item);
+                  myCart.pop(index);
+                  sum -= productNr;
+               }
+        });
+
+        $('#total').html("Total: " + sum + "€");
+  $('#totalCheck').html("Total: " + sum + "€");
+}
+
+
+
+
+
+
+</script>
+
+<div data-role="page" id="manager">
+
+	<div data-role="header">
+		<h1>Manager</h1>
+	</div><!-- /header -->
+
+	<div role="main" class="ui-content">
+    
+    <table id="managerOutput" style="width:50%;text-align: center;margin: auto;border-collapse: collapse; padding: 20px;">
+            
+    </table>
+         
+         <h2 id="revenue"></h2>
+        
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		<h4>Page Footer</h4>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+
+<div data-role="page" id="driver">
+
+	<div data-role="header">
+		<h1>Driver</h1>
+	</div><!-- /header -->
+	<div role="main" class="ui-content">
+          <button id="updatestatus">UPDATE STATUS</button>
+          <table id="driverOutput" style="width:50%;text-align: center;margin: auto;border-collapse: collapse; padding: 20px;">
+            
+          </table>
+
+          <table style="width:50%;text-align: center;margin: auto;border-collapse: collapse; padding: 20px;">
+            <tr><th>Cancel</th></tr>
+            <tr id="insert"></tr>
+          </table>
+        
+        
+         
+         
+        
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		<h4>Page Footer</h4>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<script>
+   
+   
+           
+</script>
+<div data-role="page" id="recents">
+
+	<div data-role="header">
+		<h1>Recent Orders</h1>
+	</div><!-- /header -->
+
+	<div role="main" class="ui-content">
+		
+      <h1 style="text-align: center;">Recent Orders</h1>
+        
+        <div>
+          <table id="recentsOutput" style="width:50%;text-align: center;margin: auto;border-collapse: collapse; padding: 20px;">
+            
+          </table>
+        
+        </div>
+      
+       
+         
+         
+        
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		<h4>Page Footer</h4>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+
+
+
+
+
+</body>

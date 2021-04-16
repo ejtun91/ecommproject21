@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager</title>
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+<link rel="stylesheet" href="stylesheets/style.css">
+    <style>
+          table, td, th {
+  border: 1px solid black;
+  background-color: white;
+  padding: 10px;
+  
+}
+
+
+.ui-content{
+  min-height: 100vh;
+  background-color: rgb(229, 246, 252);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.ui-btn {
+    height: 20px !important;
+    margin: 30px auto;
+    border-radius: 10px;
+    border: 1px solid black !important;
+}
+.ui-btn:hover{
+  box-shadow: 3px 3px 3px rgb(154, 155, 155);
+  
+  background: black !important;
+  color: white !important;
+}
+
+#cancel{
+    padding-bottom: 30px;
+}
+      
+      </style>
+</head>
+<body">
+    <div data-role="header">
+		<h1>Manager</h1>
+	</div><!-- /header -->
+
+	<div role="main" class="ui-content" style="min-height: 100vhvh;">
+    <table id="managerOutput" style="width:50%;text-align: center;margin: auto;border-collapse: collapse;">
+        <h2 style="text-align: center;">LAST 7 DAYS</h2>
+      <tr><th>ORDER NUMBER</th><% result.forEach(function(item) { %>
+        <td><%= item.id %></td>
+        <% }); %></tr><tr><th>DELETE ORDER</th><% result.forEach(function(item) { %>
+            <td><button id="cancel" onclick="location.href='cancel/<%= item.id %>'">DELETE</button></td>
+            <% }); %></tr>
+   
+      </tr>
+    </table>
+
+    <table id="managerOutput" style="width:50%;text-align: center;margin: auto;border-collapse: collapse;">
+        <h2 style="text-align: center;">LAST 30 DAYS</h2>
+      <tr><th>ORDER NUMBER</th><% month.forEach(function(item) { %>
+        <td><%= item.id %></td>
+        <% }); %></tr><tr><th>DELETE ORDER</th><% month.forEach(function(item) { %>
+            <td><button id="cancel" onclick="location.href='cancel/<%= item.id %>'">DELETE</button></td>
+            <% }); %></tr>
+   
+      </tr>
+    </table>
+
+    <table id="managerOutput" style="width:50%;text-align: center;margin: auto;border-collapse: collapse;">
+        <h2 style="text-align: center;">LAST 24H</h2>
+      <tr><th>ORDER NUMBER</th><% day.forEach(function(item) { %>
+        <td><%= item.id %></td>
+        <% }); %></tr><tr><th>DELETE ORDER</th><% day.forEach(function(item) { %>
+            <td><button id="cancel" onclick="location.href='cancel/<%= item.id %>'">DELETE</button></td>
+            <% }); %></tr>
+   
+      </tr>
+    </table>
+         
+    <h2 id="revenue"></h2>
+    
+      
+<div style="text-align: center;font-weight: bold;" id="currentTemp"> </div>  
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		<h4>Page Footer</h4>
+	</div><!-- /footer -->
+
+    <script>
+       
+         $.get('/getRevenueManager', function(data){
+         $("#revenue").html(data);
+       })
+
+       $.getJSON( "http://api.weatherstack.com/current?access_key=1fffac0fb58e07f7413e366c7616c36d&query=Dublin", function( json ) {
+  console.log( "JSON Data: " +json.current.temperature );
+  
+  $('#currentTemp').html("The current temperature in Dublin is: " + json.current.temperature+"°C");
+  
+ });
+      
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Test Suite</title>
+    <link rel="stylesheet" href="https://code.jquery.com/qunit/qunit-2.14.1.css">
+  </head>
+  <body>
+    <div id="qunit"></div>
+    <div id="qunit-fixture"></div>
+    <script src="https://code.jquery.com/qunit/qunit-2.14.1.js"></script>
+    
+    <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+    
+    
+    <script src="javascripts/index.js"></script>
+    
+    
+    <script>
+    
+        // check add function
+        const add = (a, b) => a + b;
+      
+        QUnit.test('should add two numbers', function(assert) {
+          assert.equal(add(1, 1), 2, '1 + 1 = 2');
+        });
+        
+        
+        
+        // checking the customer works with the database
+        var data = checkTheLogin('customer', '1');
+        
+        QUnit.test('Checking if a customer', function(assert) {
+        
+          // first parm - what we are testing
+          // second parm - what we expect to get
+          assert.equal(data, 'customer', '');
+        });
+        
+        
+        // Checking does a return name function work
+        var result = returnName();
+        
+        QUnit.test('Checking name', function(assert) {
+        
+          // first parm - what we are testing
+          // second parm - what we expect to get
+          assert.equal(result, 'customer', 'Check name');
+        });
+   
+    </script>
+</body>
+</html>
