@@ -199,40 +199,13 @@ $( "#loginbutton" ).click(function(event) {
         }
         else if(data.includes("driver")){
         
-           // move to the driver dashboard
-            // make a call to the severside to get the data!
-            // $.get( "/getDriverData", function( data ) {
-            // // throw the data onto the manager page
-            //     $( "#driverOutput" ).html( data );
-
-                
-
-          
-            // });
-
-
-           
-            
-                
         
-           // move to the manager dashboard
+           // move to the driver dashboard
            window.location="/driver";
         }
         else if(data.includes("manager")){
         
-        
-      //      // make a call to the severside to get the data!
-      //       $.get( "/getManagerData", function( data ) {
-      //       // throw the data onto the manager page
-      //           $( "#managerOutput" ).html( data );
-          
-      //       });
-
-      //       $.get('/getRevenueManager', function(data){
-      //    $("#revenue").html(data);
-      //  })
-                
-        
+      
            // move to the manager dashboard
            window.location="/manager";
         }
@@ -656,11 +629,6 @@ function addToCart(itemName){
   $('#totalCheck').html("Total: " + sum + "€");
 
 
-    //console.log(parseInt($('#total').text()));
-  
-    
-    // search the cart and see if we already added
-    // the item. If we did, remove the old qty.
 
     myCart.forEach(function(itemCurrent, index, array) {
            

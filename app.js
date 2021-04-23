@@ -65,23 +65,6 @@ app.get("/driver", function (req, res) {
         if (err) throw err;
         console.log(result);
 
-        // looping over the records
-        // for (var i = 0; i < result.length; i++) {
-        //   output =
-        //     output +
-        //     "<tr><th>ID</th><th>ITEMS-QTY</th><th>ADDRESS</th><th>STATUS</th></tr><tr><td>" +
-        //     result[i].id +
-        //     "</td><td>" +
-        //     result[i].items +
-        //     "</td><td>" +
-        //     result[i].address +
-        //     "</td><td>" +
-        //     "<button id='ordercomplete' onclick=location.href='order/" +
-        //     result[i].id +
-        //     "'>Complete Order</button>" +
-        //     "</td><tr></tr></tr>";
-        // }
-
         // return the output variable
         res.render("driver", { result: result });
       }
@@ -138,11 +121,6 @@ app.get("/", function (req, res) {
     con.query("SELECT * FROM products", function (err, outputMenu, fields) {
       if (err) throw err;
       console.log(outputMenu);
-
-      // looping over the records
-      // for (var i = 0; i < result.length; i++) {
-      //   output = output + result[i].name + "---" + result[i].price + "<br>";
-      // }
 
       // return the output variable
       res.render("index", {
@@ -255,21 +233,6 @@ app.get("/manager", function (req, res) {
     con.query(queries.join(";"), function (err, result, fields) {
       if (err) throw err;
       console.log(result);
-
-      var total = 0;
-
-      // looping over the records
-      // for (var i = 0; i < result.length; i++) {
-      //   output =
-      //     output +
-      //     "<tr><th>ORDER NUMBER</th><th>CANCEL ORDER</th></tr><tr><td>" +
-      //     result[i].id +
-      //     "</td><td><button onclick=location.href='cancel/" +
-      //     result[i].id +
-      //     "'>CANCEL</button></td></tr><tr></tr></tr>";
-      // }
-
-      // return the output variable
 
       res.render("manager", {
         result: result[0],
