@@ -8,6 +8,11 @@
     <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
 <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
 <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/canvasjs/1.7.0/canvasjs.min.js"></script>
+<script>
+  var overlays = [];
+</script>
 <link rel="stylesheet" href="stylesheets/style.css">
     <style>
           table, td, th {
@@ -43,15 +48,24 @@
 #cancel{
     padding-bottom: 30px;
 }
-      
+
+
       </style>
 </head>
-<body">
+<body>
     <div data-role="header">
 		<h1>Manager</h1>
 	</div><!-- /header -->
 
+  <select id="selectMe">
+    <option value="option">Select date</option>
+    <option value="option1">Last 7 days</option>
+    <option value="option2">Last 30 days</option>
+    <option value="option3">Last 24 hours</option>
+  </select>
+
 	<div role="main" class="ui-content" style="min-height: 100vhvh;">
+    <div id="option1" class="group">
     <table id="managerOutput" style="width:50%;text-align: center;margin: auto;border-collapse: collapse;">
         <h2 style="text-align: center;">LAST 7 DAYS</h2>
       <tr><th>ORDER NUMBER</th><% result.forEach(function(item) { %>
@@ -59,10 +73,61 @@
         <% }); %></tr><tr><th>DELETE ORDER</th><% result.forEach(function(item) { %>
             <td><button id="cancel" onclick="location.href='cancel/<%= item.id %>'">DELETE</button></td>
             <% }); %></tr>
-   
+            
       </tr>
     </table>
+    <h3 id="totalSev" style="text-align: center;"></h3>
+    <% result.forEach(function(item) { %>
+    
+    <script>
+      var totalSev = a();
+function a() {
+      let dataWeek = [];
+      let products = [];
+      let times = [];
+      let weekArr = '<%- JSON.stringify(result) %>';
+      let result = [];
+      let menuData = {menus: JSON.parse(weekArr)}
+      let totalSeven = 0;
 
+   //  console.log(menuData.menus[0].total);
+   for(var i = 0; i < menuData.menus.length; i++){
+    dataWeek.push(menuData.menus[i].total);
+      products.push(menuData.menus[i].id)
+      times.push(menuData.menus[i].time)
+      result.push({x: i, y: menuData.menus[i].total})
+      totalSeven = totalSeven + menuData.menus[i].total;
+   }
+       
+   window.addEventListener("load", function() {
+      var chart = new CanvasJS.Chart("chartContainer", {
+        animationEnabled: true,
+      title:{
+        text: "Revenue in last 7 Days"              
+      },
+      data: [              
+      {
+        // Change type to "doughnut", "line", "splineArea", etc.
+        type: "line",
+        dataPoints: result
+      }
+      ]
+    });
+    chart.render();
+    },false);
+ console.log(totalSeven);
+ $('#totalSev').html("Revenue in last 7 Days: " + totalSeven + "€");
+ return totalSeven;
+  };
+a();
+
+
+    </script>
+    
+    <% }); %>
+    <div id="chartContainer" style="height: 300px; width: 100%;text-align: center;margin: 10px auto;"></div>
+  </div>
+  <div id="option2" class="group">
     <table id="managerOutput" style="width:50%;text-align: center;margin: auto;border-collapse: collapse;">
         <h2 style="text-align: center;">LAST 30 DAYS</h2>
       <tr><th>ORDER NUMBER</th><% month.forEach(function(item) { %>
@@ -70,10 +135,59 @@
         <% }); %></tr><tr><th>DELETE ORDER</th><% month.forEach(function(item) { %>
             <td><button id="cancel" onclick="location.href='cancel/<%= item.id %>'">DELETE</button></td>
             <% }); %></tr>
-   
+            
       </tr>
     </table>
+    <h3 id="totalMon" style="text-align: center;"></h3>
+    <% month.forEach(function(item) { %>
+    
+    <script>
+function b() {
+      let dataWeek = [];
+      let products = [];
+      let times = [];
+      let weekArr = '<%- JSON.stringify(month) %>';
+      let result = [];
+      let menuData = {menus: JSON.parse(weekArr)}
+      let totalMonth = 0;
 
+   //  console.log(menuData.menus[0].total);
+   for(var i = 0; i < menuData.menus.length; i++){
+    dataWeek.push(menuData.menus[i].total);
+      products.push(menuData.menus[i].id)
+      times.push(menuData.menus[i].time)
+      result.push({x: i, y: menuData.menus[i].total})
+      totalMonth = totalMonth + menuData.menus[i].total;
+   }
+       
+   window.addEventListener("load", function() {
+      var chart = new CanvasJS.Chart("chartContainer2", {
+        animationEnabled: true,
+      title:{
+        text: "Revenue in last 30 Days"              
+      },
+      data: [              
+      {
+        // Change type to "doughnut", "line", "splineArea", etc.
+        type: "doughnut",
+        dataPoints: result
+      }
+      ]
+    });
+    chart.render();
+
+    },false);
+ $('#totalMon').html("Revenue in last 30 Days: " + totalMonth + "€");
+  };
+
+b();
+
+    </script>
+    
+    <% }); %>
+    <div id="chartContainer2" style="height: 300px; width: 100%;text-align: center;margin: 10px auto;"></div>
+  </div>
+  <div id="option3" class="group">
     <table id="managerOutput" style="width:50%;text-align: center;margin: auto;border-collapse: collapse;">
         <h2 style="text-align: center;">LAST 24H</h2>
       <tr><th>ORDER NUMBER</th><% day.forEach(function(item) { %>
@@ -81,32 +195,100 @@
         <% }); %></tr><tr><th>DELETE ORDER</th><% day.forEach(function(item) { %>
             <td><button id="cancel" onclick="location.href='cancel/<%= item.id %>'">DELETE</button></td>
             <% }); %></tr>
-   
+            
       </tr>
     </table>
-         
-    <h2 id="revenue"></h2>
+    <h3 id="totalDay" style="text-align: center;"></h3>
+    <% day.forEach(function(item) { %>
     
-      
-<div style="text-align: center;font-weight: bold;" id="currentTemp"> </div>  
-	</div><!-- /content -->
+    <script>
+function c() {
+      let dataWeek = [];
+      let products = [];
+      let times = [];
+      let weekArr = '<%- JSON.stringify(day) %>';
+      let result = [];
+      let menuData = {menus: JSON.parse(weekArr)}
+      let totalDay = 0;
 
+   //  console.log(menuData.menus[0].total);
+   for(var i = 0; i < menuData.menus.length; i++){
+    dataWeek.push(menuData.menus[i].total);
+      products.push(menuData.menus[i].id)
+      times.push(menuData.menus[i].time)
+      result.push({x: i, y: menuData.menus[i].total})
+      totalDay = totalDay + menuData.menus[i].total;
+   }
+       
+   window.addEventListener("load", function() {
+      var chart = new CanvasJS.Chart("chartContainer3", {
+        animationEnabled: true,
+      title:{
+        text: "Revenue in last 24 Hours"              
+      },
+      data: [              
+      {
+        // Change type to "doughnut", "line", "splineArea", etc.
+        type: "splineArea",
+        dataPoints: result
+      }
+      ]
+    });
+    chart.render();
+    },false);
+    $('#totalDay').html("Revenue in last 24 Hours: " + totalDay + "€");
+  };
+c();
+
+
+    </script>
+    
+    <% }); %>
+    <div id="chartContainer3" style="height: 300px; width: 100%;text-align: center;margin: 10px auto;"></div>
+  </div>
+    
+	</div><!-- /content -->
+<h2 id="revenue" style="text-align: center;font-weight: bold;"><%- JSON.stringify(month.items)%></h2>
+
+<div style="text-align: center;font-weight: bold;" id="currentTemp"> </div>  
 	<div data-role="footer">
 		<h4>Page Footer</h4>
 	</div><!-- /footer -->
 
     <script>
+
+      //   var data = [];
+
+      //   month.forEach(function(item) {
+      //     data.push(item.id);
+      // });
+
        
          $.get('/getRevenueManager', function(data){
          $("#revenue").html(data);
        })
 
-       $.getJSON( "http://api.weatherstack.com/current?access_key=1fffac0fb58e07f7413e366c7616c36d&query=Dublin", function( json ) {
+       $.getJSON( "http://api.weatherstack.com/current?access_key=be86f30e10acd5c2ac3bb128d1310647&query=Dublin", function( json ) {
   console.log( "JSON Data: " +json.current.temperature );
   
   $('#currentTemp').html("The current temperature in Dublin is: " + json.current.temperature+"°C");
   
  });
+//  $(document).ready(function () {
+//   $('.group').hide();
+//   $('#selectMe').change(function () {
+//     $('.group').hide();
+//     $('#'+$(this).val()).show();
+//   })
+// });
+$(function() {
+        $('#selectMe').change(function(){
+            $('.group').hide();
+            $('#' + $(this).val()).show();
+        });
+    });
+ 
+
       
     </script>
     
