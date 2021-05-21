@@ -108,9 +108,10 @@ $( "#submitbutton" ).click(function(event) {
       // send the data to the server-side
       $.post( "/putInDatabase", { username: username, email: email, password:password, acctype:acctype })
       .done(function( data ) {
-      //  alert( "Data Loaded: " + data );
 
-        $("#errors").append('<div style="color: black; font-weight: bold; background-color: #FFF3CD; width: 70%; font-size: 17px; padding: 15px; text-align: center; margin: 10px auto;">' + data + '</div>');
+        $('#errors').html('');
+      //  alert( "Data Loaded: " + data );
+        // $("#errors").append('<div style="color: black; font-weight: bold; background-color: #FFF3CD; width: 70%; font-size: 17px; padding: 15px; text-align: center; margin: 10px auto;">' + data + '</div>');
 
       //  console.log(Object.keys(data.errors).length === 0);
 
@@ -220,6 +221,8 @@ $( "#loginbutton" ).click(function(event) {
         // say what the account type is
        // alert( "Data Loaded: " + data );
         console.log(data);
+
+        $('#errorsLogin').html('');
 
         if(typeof data === 'object'){
         for(var i = 0; i < data.errors.length; i++){

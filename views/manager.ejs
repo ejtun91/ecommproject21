@@ -56,7 +56,6 @@
   top: 100px;
 }
 
-
       </style>
 </head>
 <body>
@@ -64,18 +63,19 @@
 		<h1>Manager</h1>
 	</div><!-- /header -->
 
-  <select id="selectMe">
-    <option value="option">Select date</option>
-    <option value="option1">Last 7 days</option>
-    <option value="option2">Last 30 days</option>
-    <option value="option3">Last 24 hours</option>
-    <option value="option4">Last Year</option>
-    <option value="option5">Dates</option>
-  </select>
 
   
 
 	<div role="main" class="ui-content" style="min-height: 100vhvh;">
+    <select id="selectMe">
+      <option value="option">Select date</option>
+      <option value="option1">Last 7 days</option>
+      <option value="option2">Last 30 days</option>
+      <option value="option3">Last 24 hours</option>
+      <option value="option4">Last Year</option>
+      <option value="option5">Dates</option>
+    </select>
+  
     <button id="logout" onclick="logout()">Log out</button>
     <div id="option1" class="group" style="margin: 15px auto;">
     <table id="managerOutput" style="width:50%;text-align: center;margin: auto;border-collapse: collapse;">
@@ -104,19 +104,12 @@ $.post( "/logout", function( data ) {
 
       var totalSev = a();
 function a() {
-      let dataWeek = [];
-      let products = [];
-      let times = [];
       let weekArr = '<%- JSON.stringify(result) %>';
       let result = [];
       let menuData = {menus: JSON.parse(weekArr)}
       let totalSeven = 0;
 
-   //  console.log(menuData.menus[0].total);
    for(var i = 0; i < menuData.menus.length; i++){
-    dataWeek.push(menuData.menus[i].total);
-      products.push(menuData.menus[i].id)
-      times.push(menuData.menus[i].time)
       result.push({x: i, y: menuData.menus[i].total})
       totalSeven = totalSeven + menuData.menus[i].total;
    }
@@ -165,19 +158,14 @@ a();
     
     <script>
 function b() {
-      let dataWeek = [];
-      let products = [];
-      let times = [];
-      let weekArr = '<%- JSON.stringify(month) %>';
+      let monthArr = '<%- JSON.stringify(month) %>';
       let result = [];
-      let menuData = {menus: JSON.parse(weekArr)}
+      let menuData = {menus: JSON.parse(monthArr)}
       let totalMonth = 0;
 
    //  console.log(menuData.menus[0].total);
    for(var i = 0; i < menuData.menus.length; i++){
-    dataWeek.push(menuData.menus[i].total);
-      products.push(menuData.menus[i].id)
-      times.push(menuData.menus[i].time)
+ 
       result.push({x: i, y: menuData.menus[i].total})
       totalMonth = totalMonth + menuData.menus[i].total;
    }
@@ -225,19 +213,13 @@ b();
     
     <script>
 function c() {
-      let dataWeek = [];
-      let products = [];
-      let times = [];
-      let weekArr = '<%- JSON.stringify(day) %>';
+      let dayArr = '<%- JSON.stringify(day) %>';
       let result = [];
-      let menuData = {menus: JSON.parse(weekArr)}
+      let menuData = {menus: JSON.parse(dayArr)}
       let totalDay = 0;
 
    //  console.log(menuData.menus[0].total);
-   for(var i = 0; i < menuData.menus.length; i++){
-    dataWeek.push(menuData.menus[i].total);
-      products.push(menuData.menus[i].id)
-      times.push(menuData.menus[i].time)
+   for(var i = 0; i < menuData.menus.length; i++){  
       result.push({x: i, y: menuData.menus[i].total})
       totalDay = totalDay + menuData.menus[i].total;
    }
@@ -284,19 +266,13 @@ c();
       
       <script>
   function d() {
-        let dataWeek = [];
-        let products = [];
-        let times = [];
-        let weekArr = '<%- JSON.stringify(year) %>';
+        let yearArr = '<%- JSON.stringify(year) %>';
         let result = [];
-        let menuData = {menus: JSON.parse(weekArr)}
+        let menuData = {menus: JSON.parse(yearArr)}
         let totalYear = 0;
   
      //  console.log(menuData.menus[0].total);
      for(var i = 0; i < menuData.menus.length; i++){
-      dataWeek.push(menuData.menus[i].total);
-        products.push(menuData.menus[i].id)
-        times.push(menuData.menus[i].time)
         result.push({x: i, y: menuData.menus[i].total})
         totalYear = totalYear + menuData.menus[i].total;
      }
@@ -310,7 +286,7 @@ c();
         data: [              
         {
           // Change type to "doughnut", "line", "splineArea", etc.
-          type: "column",
+          type: "area",
           dataPoints: result
         }
         ]
@@ -334,21 +310,14 @@ c();
     
     <script>
 function e() {
-      let dataWeek = [];
-      let products = [];
-      let times = [];
       let weekArr = '<%- JSON.stringify(year) %>';
       let result = [];
       let menuData = {menus: JSON.parse(weekArr)}
-      let totalData = 0;
 
    //  console.log(menuData.menus[0].total);
    for(var i = 0; i < menuData.menus.length; i++){
-    dataWeek.push(menuData.menus[i].total);
-      products.push(menuData.menus[i].id)
-      times.push(menuData.menus[i].time)
-      result.push({x: new Date(menuData.menus[i].time), y: i})
-      totalData = totalData + menuData.menus[i].total;
+      result.push({x: new Date(menuData.menus[i].time), y: menuData.menus[i].total})
+      
    }
        
    window.addEventListener("load", function() {
@@ -360,7 +329,7 @@ function e() {
       data: [              
       {
         // Change type to "doughnut", "line", "splineArea", etc.
-        type: "area",
+        type: "column",
         xValueType: "dateTime",
         dataPoints: result
       }

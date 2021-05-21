@@ -24,7 +24,7 @@ app.use(
     secret: "keyboard cat",
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false, maxAge: 100000 },
+    cookie: { secure: false, maxAge: 200000 },
   })
 );
 
@@ -397,8 +397,16 @@ app.post(
   "/checkTheLogin",
   [
     // Check validity
-    check("username").not().isEmpty().withMessage("username is required"),
-    check("password").not().isEmpty().withMessage("password is required"),
+    check("username")
+      .not()
+      .isEmpty()
+      .withMessage("username is required")
+      .exists(),
+    check("password")
+      .not()
+      .isEmpty()
+      .withMessage("password is required")
+      .exists(),
   ],
   function (req, res) {
     // catching the variables
