@@ -251,9 +251,9 @@ app.get("/manager", function (req, res) {
 
   var queries = [
     "SELECT * FROM customerorders where time BETWEEN CURDATE()-7 AND CURDATE()",
-    "SELECT * FROM customerorders where time BETWEEN CURDATE()-30 AND CURDATE()",
+    "SELECT * FROM customerorders where time >= (CURDATE() + INTERVAL -30 DAY)",
     "SELECT * FROM customerorders where time BETWEEN CURDATE()-1 AND CURDATE()",
-    "SELECT * FROM customerorders where time BETWEEN CURDATE()-365 AND CURDATE()",
+    "SELECT * FROM customerorders where time >= (CURDATE() + INTERVAL -365 DAY)",
   ];
 
   con.connect(function (err) {
@@ -581,7 +581,7 @@ app.post(
         console.log(sql);
         con.query(sql, function (err, result) {
           if (err) throw err;
-          res.send("User Registered");
+          res.send("Registration process successful");
         });
       });
     } else {

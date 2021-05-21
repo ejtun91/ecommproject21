@@ -21,7 +21,7 @@
 <div data-role="page" id="homepage">
 
 	<div data-role="header">
-		<h1>Page Title</h1>
+		<h1>Home</h1>
 	</div><!-- /header -->
 
 	<div role="main" class="ui-content">
@@ -111,7 +111,9 @@ $( "#submitbutton" ).click(function(event) {
 
         $('#errors').html('');
       //  alert( "Data Loaded: " + data );
-        // $("#errors").append('<div style="color: black; font-weight: bold; background-color: #FFF3CD; width: 70%; font-size: 17px; padding: 15px; text-align: center; margin: 10px auto;">' + data + '</div>');
+      if(typeof data ===  'string'){
+        $("#errors").append('<div style="color: black; font-weight: bold; background-color: #FFF3CD; width: 70%; font-size: 17px; padding: 15px; text-align: center; margin: 10px auto;">' + data + '</div>');
+      }
 
       //  console.log(Object.keys(data.errors).length === 0);
 
