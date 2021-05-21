@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver</title>
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/canvasjs/1.7.0/canvasjs.min.js"></script>
+    <style>
+      table, td, th {
+  border: 1px solid black;
+  background-color: white;
+  padding: 10px;
+  
+}
+
+.ui-content{
+  min-height: 100vh;
+  background-color: rgb(229, 246, 252);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.ui-btn {
+    height: 20px !important;
+    margin: 30px auto;
+    border-radius: 10px;
+    border: 1px solid black !important;
+}
+.ui-btn:hover{
+  box-shadow: 3px 3px 3px rgb(154, 155, 155);
+  
+  background: black !important;
+  color: white !important;
+}
+
+#logout {
+  padding-bottom: 30px;
+  width: 10%;
+  position: absolute;
+  right: 150px;
+  top: 100px;
+}
+
+      
+      </style>
+</head>
+<body>
+
+    <div role="main" class="ui-content">
+		
+        <h1 style="text-align: center;">Recent Orders</h1>
+
+        <h3 id="totalSev" style="text-align: center;"></h3>
+  
+        <script>
+
+
+           require('./index');
+
+           var un = globalUsername;
+
+              $.get( "/getRecents", {un: un}) 
+                .done(function( data ) {
+                  // throw the data onto the manager page
+                $( "#recentsOutput" ).html( data );
+               });
+var totalSev = a();
+
+          function a() {
+        let dataWeek = [];
+        let products = [];
+        let times = [];
+        let weekArr = '<%- JSON.stringify(result) %>';
+        let result = [];
+        let menuData = {menus: JSON.parse(weekArr)}
+        let totalSeven = 0;
+  
+     //  console.log(menuData.menus[0].total);
+     for(var i = 0; i < menuData.menus.length; i++){
+      dataWeek.push(menuData.menus[i].total);
+        products.push(menuData.menus[i].id)
+        times.push(menuData.menus[i].time)
+        result.push({x: i, y: menuData.menus[i].total})
+        totalSeven = totalSeven + menuData.menus[i].total;
+     }
+         
+     window.addEventListener("load", function() {
+        var chart = new CanvasJS.Chart("chartContainer", {
+          animationEnabled: true,
+        title:{
+          text: "Revenue in last 7 Days"              
+        },
+        data: [              
+        {
+          // Change type to "doughnut", "line", "splineArea", etc.
+          type: "line",
+          dataPoints: result
+        }
+        ]
+      });
+      chart.render();
+      },false);
+   console.log(totalSeven);
+   $('#totalSev').html("Revenue in last 7 Days: " + totalSeven + "€");
+   return totalSeven;
+    };
+  a();
+        </script>
+
+<div id="chartContainer" style="height: 300px; width: 100%;text-align: center;margin: 10px auto;"></div>
+          
+          <div>
+            <table id="recentsOutput" style="width:50%;text-align: center;margin: auto;border-collapse: collapse; padding: 20px;">
+              
+            </table>
+          
+          </div>
+        
+         
+           
+           
+          
+      </div><!-- /content -->
+  
+      <div data-role="footer">
+          <h4>Page Footer</h4>
+      </div><!-- /footer -->
+  </div><!-- /page -->
+    
+</body>
+</html>

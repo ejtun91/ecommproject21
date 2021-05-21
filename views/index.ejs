@@ -1,8 +1,10 @@
 
 <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
 <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+
 <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
 <link rel="stylesheet" href="stylesheets/style.css">
+
 <script>
   var username = $('#username').val();
 </script>
@@ -45,7 +47,9 @@
 		<h1>Register</h1>
 	</div><!-- /header -->
 
-	<div role="main" class="ui-content">
+	<div role="main" class="ui-content" style="width: 100%;">
+
+    <div id="errors" style="width: 100%;"></div>
 	
     
     Username <input type="text" id="username"/> <br>
@@ -86,25 +90,70 @@ $( "#submitbutton" ).click(function(event) {
   
   var isValid = true;
   
-  if(username == ""){
-     alert("Please enter a username");
-     isValid = false;
-  }
-  if(!email.includes("@")){
-     alert("Please enter a valid email");
-     isValid = false;
-  }
+  // if(username == ""){
+  //    isValid = false;
+  // }
+  // if(email == ""){
+  //    isValid = false;
+  // }
 
  // only send the data to the database, if the param is true.
-  if(isValid == true){
+
+ var resultError = [];
+ var errors = [];
+ errors[0] = "username";
+ errors[1] = "password";
+
+
       // send the data to the server-side
       $.post( "/putInDatabase", { username: username, email: email, password:password, acctype:acctype })
       .done(function( data ) {
-        alert( "Data Loaded: " + data );
-      });
-  }
-  
-  
+      //  alert( "Data Loaded: " + data );
+
+        $("#errors").append('<div style="color: black; font-weight: bold; background-color: #FFF3CD; width: 70%; font-size: 17px; padding: 15px; text-align: center; margin: 10px auto;">' + data + '</div>');
+
+      //  console.log(Object.keys(data.errors).length === 0);
+
+        for(var i = 0; i < data.errors.length; i++){
+          if(data.errors[i].msg == 'username is required'){
+            $("#errors").append('<div style="color: black; font-weight: bold; background-color: #FFF3CD; width: 70%; font-size: 17px; padding: 15px; text-align: center; margin: 10px auto;">Please enter Username</div>');
+          }
+          if(data.errors[i].msg == 'wrong username length'){
+            $("#errors").append('<div style="color: black; font-weight: bold; background-color: #FFF3CD; width: 70%; font-size: 17px; padding: 15px; text-align: center; margin: 10px auto;">Must be at least 3 characters long</div>');
+          }
+          if(data.errors[i].msg == 'Invalid email'){
+            $("#errors").append('<div style="color: black; font-weight: bold; background-color: #FFF3CD; width: 70%; font-size: 17px; padding: 15px; text-align: center; margin: 10px auto;">Invalid Email</div>');
+          }
+
+          if(data.errors[i].msg == 'pass must be at least 5 chars long'){
+            $("#errors").append('<div style="color: black; font-weight: bold; background-color: #FFF3CD; width: 70%; font-size: 17px; padding: 15px; text-align: center; margin: 10px auto;">pass must be at least 5 chars long</div>');
+          }
+          if(data.errors[i].msg == 'pass must contain a number'){
+            $("#errors").append('<div style="color: black; font-weight: bold; background-color: #FFF3CD; width: 70%; font-size: 17px; padding: 15px; text-align: center; margin: 10px auto;">pass must contain a number</div>');
+          }
+        }
+
+      
+          })
+
+        
+
+    
+
+        //  console.log(resultError);
+          
+      //     for(var i = 0; i < resultError.length; i++){
+          
+          
+      //     if(resultError[i] == true){
+      //       $("#errors").append('<div style="color: black; font-weight: bold; background-color: #FFF3CD; width: 70%; font-size: 17px; padding: 15px; text-align: center; margin: 10px auto;">Please enter ' + errors[i] + '</div>');
+      //       isValid = false;
+      //   }
+        
+        
+      // }
+
+    
   
 });
 
@@ -125,8 +174,10 @@ $( "#submitbutton" ).click(function(event) {
 		<h1>Login</h1>
 	</div><!-- /header -->
 
-	<div role="main" class="ui-content">
-        
+ 
+
+	<div role="main" class="ui-content" style="width: 100%;">
+    <div id="errorsLogin" style="width: 100%;"></div>
         
         Username <input type="text" id="loginUsername"/> <br>
         Password <input type="text" id="loginPassword"/> <br>
@@ -154,23 +205,35 @@ $( "#loginbutton" ).click(function(event) {
   var un = $('#loginUsername').val();
   var pw = $('#loginPassword').val();
   
-  if(un == "")
-  {
-     alert("Please enter a username");
-  }
-  if(pw ==""){
-    alert("please enter a password");
-  }
+  // if(un == "")
+  // {
+  //    alert("Please enter a username");
+  // }
+  // if(pw ==""){
+  //   alert("please enter a password");
+  // }
   
 
   
   $.post( "/checkTheLogin", { username: un, password: pw })
       .done(function( data ) {
         // say what the account type is
-        alert( "Data Loaded: " + data );
+       // alert( "Data Loaded: " + data );
+        console.log(data);
+
+        if(typeof data === 'object'){
+        for(var i = 0; i < data.errors.length; i++){
+          if(data.errors[i].msg == 'username is required'){
+            $("#errorsLogin").append('<div style="color: black; font-weight: bold; background-color: #FFF3CD; width: 70%; font-size: 17px; padding: 15px; text-align: center; margin: 10px auto;">username is required</div>');
+          }
+          if(data.errors[i].msg == 'password is required'){
+            $("#errorsLogin").append('<div style="color: black; font-weight: bold; background-color: #FFF3CD; width: 70%; font-size: 17px; padding: 15px; text-align: center; margin: 10px auto;">password is required</div>');
+          }
+        }
+      }else{
 
          // put in the session
-    $.post( "/putInSession", { un: username} );
+    $.post( "/putInSession", { username: un} );
 
         if(data.includes("customer")){
 
@@ -210,8 +273,9 @@ $( "#loginbutton" ).click(function(event) {
            window.location="/manager";
         }
         
-        
+      }
       });
+    
   
   
  }); 
@@ -269,7 +333,7 @@ var price = [5,3,2];
 
 	<div role="main" class="ui-content">
 	
-
+ <button id="logout" style="padding-bottom: 30px; width: 10%; position: absolute; right: 150px; top: 100px;" onclick="logout()">Log out</button>
     <div id="output">
 
 
@@ -497,7 +561,15 @@ var price = [5,3,2];
             </div>
 
             <script>
+function logout(){
 
+$.post( "/logout", function( data ) {
+     
+     window.location="/";
+     
+ });
+
+}
         
               $( "#submitaddress" ).click(function(event) {
                 // stop the default redirect of the browser
@@ -743,6 +815,8 @@ function deleteProduct(item){
 	<div role="main" class="ui-content">
 		
       <h1 style="text-align: center;">Recent Orders</h1>
+
+      
         
         <div>
           <table id="recentsOutput" style="width:50%;text-align: center;margin: auto;border-collapse: collapse; padding: 20px;">
@@ -767,3 +841,88 @@ function deleteProduct(item){
 
 
 </body>
+
+<script>
+  // generic method of checking every pages login is valid
+  $(document).on("pagebeforecreate",function(event){
+       
+       console.log("Page Before Create called");
+      
+        // Finding out what the type of page is being
+        // accessed, if it is a manager page, driver page etc
+        // if we want to see should the user be on the page
+        // with their account type.
+        var url = $(location).attr('href');
+        var acctype = '';
+        
+        if(url.endsWith('/manager')){
+             acctype = 'manager';
+        }
+        if(url.endsWith('/driver')){
+             acctype = 'driver';
+        }
+        if(url.endsWith('#customerdash') || url.endsWith('#recents') || url.endsWith("#checkoutreview")){
+             acctype = 'customer';
+        }
+        console.log("acc type we are checking:"+acctype);
+         
+        console.log(url);
+        
+        var shouldWeTestValidation = true;
+            //
+            // If we are on the home page
+            // or if we are on the login page
+            // don't attempt to redirect the user!
+            var n = url.endsWith("3000");
+            var nn = url.endsWith("3000/");
+            
+            if(n  == true || nn == true){
+               console.log("on the index page");
+               shouldWeTestValidation = false;
+            }
+            
+            var n = url.endsWith("/#login");
+            if(n == true){
+               console.log("on the login page");
+               shouldWeTestValidation = false;
+            }
+         
+           if(shouldWeTestValidation == true){
+              console.log("checking login validation");
+              
+              
+              
+               // send the acc type we are checking also
+               // this will be a driver or a manger if we
+               // happen to be on that page.
+              $.post( "/checkStatus", { acctype: acctype })
+                .done(function( data ) {
+                  
+                  console.log(data);
+                  
+                  if(data.includes("false")){
+                     window.location="/";
+                   }
+                });
+              
+              
+              
+           }
+  
+  });
+  
+  
+  $(document).on("pagebeforecreate", "#driver",function(event){
+       alert("pagecreate event fired!");
+    
+    $.get( "/checkStatus", function( data ) {
+           if(data == "false"){
+              window.location="/";
+           }
+      });
+  
+  
+  
+  });
+  
+  </script>

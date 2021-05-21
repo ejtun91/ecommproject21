@@ -48,6 +48,13 @@
 #cancel{
     padding-bottom: 30px;
 }
+#logout {
+  padding-bottom: 30px;
+  width: 10%;
+  position: absolute;
+  right: 150px;
+  top: 100px;
+}
 
 
       </style>
@@ -62,10 +69,15 @@
     <option value="option1">Last 7 days</option>
     <option value="option2">Last 30 days</option>
     <option value="option3">Last 24 hours</option>
+    <option value="option4">Last Year</option>
+    <option value="option5">Dates</option>
   </select>
 
+  
+
 	<div role="main" class="ui-content" style="min-height: 100vhvh;">
-    <div id="option1" class="group">
+    <button id="logout" onclick="logout()">Log out</button>
+    <div id="option1" class="group" style="margin: 15px auto;">
     <table id="managerOutput" style="width:50%;text-align: center;margin: auto;border-collapse: collapse;">
         <h2 style="text-align: center;">LAST 7 DAYS</h2>
       <tr><th>ORDER NUMBER</th><% result.forEach(function(item) { %>
@@ -80,6 +92,16 @@
     <% result.forEach(function(item) { %>
     
     <script>
+function logout(){
+
+$.post( "/logout", function( data ) {
+     
+     window.location="/";
+     
+ });
+
+}
+
       var totalSev = a();
 function a() {
       let dataWeek = [];
@@ -127,7 +149,7 @@ a();
     <% }); %>
     <div id="chartContainer" style="height: 300px; width: 100%;text-align: center;margin: 10px auto;"></div>
   </div>
-  <div id="option2" class="group">
+  <div id="option2" class="group" style="margin: 15px auto;">
     <table id="managerOutput" style="width:50%;text-align: center;margin: auto;border-collapse: collapse;">
         <h2 style="text-align: center;">LAST 30 DAYS</h2>
       <tr><th>ORDER NUMBER</th><% month.forEach(function(item) { %>
@@ -187,7 +209,7 @@ b();
     <% }); %>
     <div id="chartContainer2" style="height: 300px; width: 100%;text-align: center;margin: 10px auto;"></div>
   </div>
-  <div id="option3" class="group">
+  <div id="option3" class="group" style="margin: 15px auto;">
     <table id="managerOutput" style="width:50%;text-align: center;margin: auto;border-collapse: collapse;">
         <h2 style="text-align: center;">LAST 24H</h2>
       <tr><th>ORDER NUMBER</th><% day.forEach(function(item) { %>
@@ -246,6 +268,116 @@ c();
     <% }); %>
     <div id="chartContainer3" style="height: 300px; width: 100%;text-align: center;margin: 10px auto;"></div>
   </div>
+    <div id="option4" class="group" style="margin: 15px auto;">
+      <table id="managerOutput" style="width:50%;text-align: center;margin: auto;border-collapse: collapse;">
+          <h2 style="text-align: center;">LAST YEAR</h2>
+        <tr><th>ORDER NUMBER</th><% year.forEach(function(item) { %>
+          <td><%= item.id %></td>
+          <% }); %></tr><tr><th>DELETE ORDER</th><% year.forEach(function(item) { %>
+              <td><button id="cancel" onclick="location.href='cancel/<%= item.id %>'">DELETE</button></td>
+              <% }); %></tr>
+              
+        </tr>
+      </table>
+      <h3 id="totalYear" style="text-align: center;"></h3>
+      <% year.forEach(function(item) { %>
+      
+      <script>
+  function d() {
+        let dataWeek = [];
+        let products = [];
+        let times = [];
+        let weekArr = '<%- JSON.stringify(year) %>';
+        let result = [];
+        let menuData = {menus: JSON.parse(weekArr)}
+        let totalYear = 0;
+  
+     //  console.log(menuData.menus[0].total);
+     for(var i = 0; i < menuData.menus.length; i++){
+      dataWeek.push(menuData.menus[i].total);
+        products.push(menuData.menus[i].id)
+        times.push(menuData.menus[i].time)
+        result.push({x: i, y: menuData.menus[i].total})
+        totalYear = totalYear + menuData.menus[i].total;
+     }
+         
+     window.addEventListener("load", function() {
+        var chart = new CanvasJS.Chart("chartContainer4", {
+          animationEnabled: true,
+        title:{
+          text: "Revenue from last year"              
+        },
+        data: [              
+        {
+          // Change type to "doughnut", "line", "splineArea", etc.
+          type: "column",
+          dataPoints: result
+        }
+        ]
+      });
+      chart.render();
+      },false);
+      $('#totalYear').html("Revenue from last year: " + totalYear + "€");
+    };
+  d();
+  
+  
+      </script>
+      
+      <% }); %>
+      <div id="chartContainer4" style="height: 300px; width: 100%;text-align: center;margin: 10px auto;"></div>
+  </div>
+
+  <div id="option5" class="group" style="margin: 15px auto; width: 80%;">
+    
+    <% year.forEach(function(item) { %>
+    
+    <script>
+function e() {
+      let dataWeek = [];
+      let products = [];
+      let times = [];
+      let weekArr = '<%- JSON.stringify(year) %>';
+      let result = [];
+      let menuData = {menus: JSON.parse(weekArr)}
+      let totalData = 0;
+
+   //  console.log(menuData.menus[0].total);
+   for(var i = 0; i < menuData.menus.length; i++){
+    dataWeek.push(menuData.menus[i].total);
+      products.push(menuData.menus[i].id)
+      times.push(menuData.menus[i].time)
+      result.push({x: new Date(menuData.menus[i].time), y: i})
+      totalData = totalData + menuData.menus[i].total;
+   }
+       
+   window.addEventListener("load", function() {
+      var chart = new CanvasJS.Chart("chartContainer5", {
+        animationEnabled: true,
+      title:{
+        text: "Dates"              
+      },
+      data: [              
+      {
+        // Change type to "doughnut", "line", "splineArea", etc.
+        type: "area",
+        xValueType: "dateTime",
+        dataPoints: result
+      }
+      ]
+    });
+    chart.render();
+    },false);
+  
+  };
+e();
+
+
+    </script>
+    
+    <% }); %>
+    <div id="chartContainer5" style="height: 300px; width: 100%;text-align: center;margin: 10px auto;"></div>
+</div>
     
 	</div><!-- /content -->
 <h2 id="revenue" style="text-align: center;font-weight: bold;"><%- JSON.stringify(month.items)%></h2>
@@ -291,6 +423,88 @@ $(function() {
 
       
     </script>
+
+<script>
+  // generic method of checking every pages login is valid
+  $(document).on("pagebeforecreate",function(event){
+       
+       console.log("Page Before Create called");
+      
+        // Finding out what the type of page is being
+        // accessed, if it is a manager page, driver page etc
+        // if we want to see should the user be on the page
+        // with their account type.
+        var url = $(location).attr('href');
+        var acctype = '';
+        
+        if(url.endsWith('/manager')){
+             acctype = 'manager';
+        }
+        if(url.endsWith('/driver')){
+             acctype = 'driver';
+        }
+        console.log("acc type we are checking:"+acctype);
+         
+        console.log(url);
+        
+        var shouldWeTestValidation = true;
+            //
+            // If we are on the home page
+            // or if we are on the login page
+            // don't attempt to redirect the user!
+            var n = url.endsWith("3000");
+            var nn = url.endsWith("3000/");
+            
+            if(n  == true || nn == true){
+               console.log("on the index page");
+               shouldWeTestValidation = false;
+            }
+            
+            var n = url.endsWith("/#login");
+            if(n == true){
+               console.log("on the login page");
+               shouldWeTestValidation = false;
+            }
+         
+           if(shouldWeTestValidation == true){
+              console.log("checking login validation");
+              
+              
+              
+               // send the acc type we are checking also
+               // this will be a driver or a manger if we
+               // happen to be on that page.
+              $.post( "/checkStatus", { acctype: acctype })
+                .done(function( data ) {
+                  
+                  console.log(data);
+                  
+                  if(data.includes("false")){
+                     window.location="/";
+                   }
+                });
+              
+              
+              
+           }
+  
+  });
+  
+  
+  $(document).on("pagebeforecreate", "driver",function(event){
+       alert("pagecreate event fired!");
+    
+    $.get( "/checkStatus", function( data ) {
+           if(data == "false"){
+              window.location="/";
+           }
+      });
+  
+  
+  
+  });
+  
+  </script>
     
 </body>
 </html>

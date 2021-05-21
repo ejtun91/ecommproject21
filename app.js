@@ -5,16 +5,28 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 
 var session = require("express-session");
+var validator = require("validator");
+const { check, validationResult } = require("express-validator");
+const bodyParser = require("body-parser");
+const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var testRouter = require("./routes/test");
+const { use } = require("./routes/index");
 
 var app = express();
 
 app.set("trust proxy", 1); // trust first proxy
 // Use the session middleware
-app.use(session({ secret: "keyboard cat", cookie: { maxAge: 60000 } }));
+app.use(
+  session({
+    secret: "keyboard cat",
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false, maxAge: 100000 },
+  })
+);
 
 app.use(express.static(__dirname + "/public"));
 // view engine setup
@@ -28,17 +40,9 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 //app.use("/", indexRouter);
+app.use(logger("dev"));
 app.use("/users", usersRouter);
 app.use("/test", testRouter);
-app.get("/testSession", function (req, res) {
-  // set
-  req.session.email = "test@domain.com";
-
-  // get
-  var temp = req.session.email;
-
-  res.send("hello" + temp);
-});
 
 app.get("/driver", function (req, res) {
   // put the data in the database
@@ -70,6 +74,29 @@ app.get("/driver", function (req, res) {
       }
     );
   });
+});
+
+// app.get(
+//   "/register",
+//   urlencodedParser,
+//   [
+//     check("username", "This username must me 3+ characters long")
+//       .exists()
+//       .isLength({ min: 3 }),
+//     check("email", "Email is not valid").isEmail().normalizeEmail(),
+//   ],
+//   (req, res) => {
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//       // return res.status(422).jsonp(errors.array())
+//       const alert = errors.array();
+//       res.render("register", { alert });
+//     }
+//   }
+// );
+
+app.get("/register", (req, res) => {
+  res.render("register");
 });
 
 app.post("/updateStatus", function (req, res) {
@@ -226,6 +253,7 @@ app.get("/manager", function (req, res) {
     "SELECT * FROM customerorders where time BETWEEN CURDATE()-7 AND CURDATE()",
     "SELECT * FROM customerorders where time BETWEEN CURDATE()-30 AND CURDATE()",
     "SELECT * FROM customerorders where time BETWEEN CURDATE()-1 AND CURDATE()",
+    "SELECT * FROM customerorders where time BETWEEN CURDATE()-365 AND CURDATE()",
   ];
 
   con.connect(function (err) {
@@ -238,6 +266,7 @@ app.get("/manager", function (req, res) {
         result: result[0],
         month: result[1],
         day: result[2],
+        year: result[3],
       });
     });
   });
@@ -364,46 +393,94 @@ app.get("/cancel/:id", function (req, res) {
   res.redirect("back");
 });
 
-app.post("/checkTheLogin", function (req, res) {
-  // catching the variables
-  var username = req.body.username;
-  var pass = req.body.password;
-  var myVar = 1;
+app.post(
+  "/checkTheLogin",
+  [
+    // Check validity
+    check("username").not().isEmpty().withMessage("username is required"),
+    check("password").not().isEmpty().withMessage("password is required"),
+  ],
+  function (req, res) {
+    // catching the variables
+    var username = req.body.username;
+    var pass = req.body.password;
 
-  // setting the username into the session
-  req.session.username = username;
-  req.session.validSession = true;
+    // catching the variables
+    var username = req.body.username;
+    var pass = req.body.password;
 
-  var timeLeft = req.session.cookie.maxAge / 1000;
-  console.log("Time left " + timeLeft);
+    // return validation results
+    const errors = validationResult(req);
 
-  // put the data in the database
-  // pulling in mysql
-  var mysql = require("mysql");
-  // set up a connection
-  var con = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    database: "test",
-    password: "",
-  });
+    if (Object.keys(errors.errors).length === 0) {
+      // setting the username into the session
+      req.session.username = username;
+      req.session.validSession = true;
 
-  con.connect(function (err) {
-    if (err) throw err;
-    con.query(
-      "SELECT * FROM users WHERE username = '" +
-        username +
-        "' AND PASSWORD = '" +
-        pass +
-        "' LIMIT 1;",
-      function (err, result, fields) {
+      var timeLeft = req.session.cookie.maxAge / 1000;
+      console.log("Time left " + timeLeft);
+
+      // put the data in the database
+      // pulling in mysql
+      var mysql = require("mysql");
+      // set up a connection
+      var con = mysql.createConnection({
+        host: "localhost",
+        user: "root",
+        database: "test",
+        password: "",
+      });
+
+      con.connect(function (err) {
         if (err) throw err;
-        console.log(result);
-        // return the account type back
-        res.send(result[0].acctype);
-      }
-    );
-  });
+        con.query(
+          "SELECT * FROM users WHERE username = '" +
+            username +
+            "' AND PASSWORD = '" +
+            pass +
+            "' LIMIT 1;",
+          function (err, result, fields) {
+            if (err) throw err;
+            console.log(result);
+            req.session.acctype = result[0].acctype;
+            // return the account type back
+            res.send(result[0].acctype);
+          }
+        );
+      });
+    } else {
+      res.send(errors);
+    }
+  }
+);
+
+app.post("/logout", function (req, res) {
+  req.session.destroy();
+  res.send("ok");
+});
+
+app.post("/checkStatus", function (req, res) {
+  console.log("---------------------");
+  console.log("/check status session is" + req.session.id);
+
+  var validSession = req.session.validSession;
+
+  if (typeof validSession === "undefined") {
+    res.send("Undefined - Setting false");
+  } else if (validSession == false) {
+    res.send("Set as - false");
+  } else {
+    var acctype = req.session.acctype;
+    var postAccType = req.body.acctype;
+    console.log("Session acc type:" + acctype);
+    console.log("Sent acc type:" + postAccType);
+
+    if (acctype == postAccType) {
+      res.send("Acc types match - true");
+    } else {
+      res.send(" Acc types dont match - false");
+    }
+  }
 });
 
 app.post("/putInAddress", function (req, res) {
@@ -441,46 +518,69 @@ app.post("/putInAddress", function (req, res) {
   });
 });
 
-app.post("/putInDatabase", function (req, res) {
-  // catching the variables
-  var username = req.body.username;
-  var email = req.body.email;
-  var pass = req.body.password;
-  var acctype = req.body.acctype;
+app.post(
+  "/putInDatabase",
+  [
+    // Check validity
+    check("username")
+      .not()
+      .isEmpty()
+      .withMessage("username is required")
+      .isLength({ min: 3 })
+      .withMessage("wrong username length"),
+    check("email", "Invalid email").isEmail(),
+    check("password")
+      .isLength({ min: 5 })
+      .withMessage("pass must be at least 5 chars long")
+      .matches(/\d/)
+      .withMessage("pass must contain a number"),
+  ],
+  function (req, res) {
+    // catching the variables
+    var username = req.body.username;
+    var email = req.body.email;
+    var pass = req.body.password;
+    var acctype = req.body.acctype;
+    var err_msg = "";
 
-  // put the data in the database
-  // pulling in mysql
-  var mysql = require("mysql");
+    // return validation results
+    const errors = validationResult(req);
 
-  // set up a connection
-  var con = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    database: "test",
-    password: "",
-  });
+    if (Object.keys(errors.errors).length === 0) {
+      var mysql = require("mysql");
 
-  con.connect(function (err) {
-    if (err) throw err;
-    console.log("Connected!");
-    var sql =
-      "INSERT INTO `test`.`users` (`username`, `email`, `password`, `acctype`) VALUES ('" +
-      username +
-      "', '" +
-      email +
-      "', '" +
-      pass +
-      "', '" +
-      acctype +
-      "');";
-    console.log(sql);
-    con.query(sql, function (err, result) {
-      if (err) throw err;
-      console.log("1 record inserted");
-    });
-  });
-  res.send("Data went to the database");
-});
+      // set up a connection
+      var con = mysql.createConnection({
+        host: "localhost",
+        user: "root",
+        database: "test",
+        password: "",
+      });
+
+      con.connect(function (err) {
+        if (err) throw err;
+        console.log("Connected!");
+        var sql =
+          "INSERT INTO `test`.`users` (`username`, `email`, `password`, `acctype`) VALUES ('" +
+          username +
+          "', '" +
+          email +
+          "', '" +
+          pass +
+          "', '" +
+          acctype +
+          "');";
+        console.log(sql);
+        con.query(sql, function (err, result) {
+          if (err) throw err;
+          res.send("User Registered");
+        });
+      });
+    } else {
+      res.send(errors);
+    }
+  }
+);
 
 app.get("/putInSession", function (req, res) {
   var cart = req.body.cart;

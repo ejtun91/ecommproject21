@@ -38,6 +38,14 @@
   color: white !important;
 }
 
+#logout {
+  padding-bottom: 30px;
+  width: 10%;
+  position: absolute;
+  right: 150px;
+  top: 100px;
+}
+
       
       </style>
 </head>
@@ -48,6 +56,7 @@
 
 	<div role="main" class="ui-content">
         <button id="updatestatus" style="width: 30%;padding-bottom: 30px;margin: 15px 10px;" >CLICK TO MAKE ALL ORDERS READY FOR DISPATCH</button>
+        <button id="logout" onclick="logout()">Log out</button>
         <h2 id="status"></h2>
     <table id="managerOutput" style="width:50%;text-align: center;margin: auto;border-collapse: collapse;">
       <tr><th>ITEMS-QTY</th><% result.forEach(function(item) { %>
@@ -71,11 +80,15 @@
 	</div><!-- /footer -->
 
     <script>
-        // $('#update').click(function(event){
-        //     event.preventDefault();
+       function logout(){
 
-        //     window.location.reload();
-        // })
+$.post( "/logout", function( data ) {
+     
+     window.location="/";
+     
+ });
+
+}
 
         $('#update').click(function(event){
                 event.preventDefault();
@@ -99,6 +112,88 @@
             })
        
     </script>
+
+<script>
+  // generic method of checking every pages login is valid
+  $(document).on("pagebeforecreate",function(event){
+       
+       console.log("Page Before Create called");
+      
+        // Finding out what the type of page is being
+        // accessed, if it is a manager page, driver page etc
+        // if we want to see should the user be on the page
+        // with their account type.
+        var url = $(location).attr('href');
+        var acctype = '';
+        
+        if(url.endsWith('manager')){
+             acctype = 'manager';
+        }
+        if(url.endsWith('driver')){
+             acctype = 'driver';
+        }
+        console.log("acc type we are checking:"+acctype);
+         
+        console.log(url);
+        
+        var shouldWeTestValidation = true;
+            //
+            // If we are on the home page
+            // or if we are on the login page
+            // don't attempt to redirect the user!
+            var n = url.endsWith("3000");
+            var nn = url.endsWith("3000/");
+            
+            if(n  == true || nn == true){
+               console.log("on the index page");
+               shouldWeTestValidation = false;
+            }
+            
+            var n = url.endsWith("/#login");
+            if(n == true){
+               console.log("on the login page");
+               shouldWeTestValidation = false;
+            }
+         
+           if(shouldWeTestValidation == true){
+              console.log("checking login validation");
+              
+              
+              
+               // send the acc type we are checking also
+               // this will be a driver or a manger if we
+               // happen to be on that page.
+              $.post( "/checkStatus", { acctype: acctype })
+                .done(function( data ) {
+                  
+                  console.log(data);
+                  
+                  if(data.includes("false")){
+                     window.location="/";
+                   }
+                });
+              
+              
+              
+           }
+  
+  });
+  
+  
+  $(document).on("pagebeforecreate", "driver",function(event){
+       alert("pagecreate event fired!");
+    
+    $.get( "/checkStatus", function( data ) {
+           if(data == "false"){
+              window.location="/";
+           }
+      });
+  
+  
+  
+  });
+  
+  </script>
     
 </body>
 </html>
